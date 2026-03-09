@@ -54,12 +54,12 @@ const setupMobileMenu = () => {
 
 const quoteMessage = (formData) => {
   return [
-    "Hola NexgenFlows Ingeniería, necesito una cotización:",
+    "Hola NexgenFlows Ingenieria, necesito una cotizacion:",
     "",
     `Nombre: ${formData.nombre}`,
     `Empresa: ${formData.empresa || "No informa"}`,
     `Correo: ${formData.correo}`,
-    `Teléfono: ${formData.telefono}`,
+    `Telefono: ${formData.telefono}`,
     `Tipo de requerimiento: ${formData.tipo}`,
     "",
     "Detalle:",
@@ -70,7 +70,7 @@ const quoteMessage = (formData) => {
 };
 
 const buildMailtoUrl = (formData) => {
-  const subject = `Cotización - ${formData.tipo} - ${formData.nombre}`;
+  const subject = `Cotizacion - ${formData.tipo} - ${formData.nombre}`;
   const body = quoteMessage(formData);
   return `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 };
@@ -99,7 +99,14 @@ const showFeedback = (text, isError = false) => {
 const setSubmittingState = (form, isSubmitting) => {
   const elements = form.querySelectorAll("input, select, textarea, button");
   elements.forEach((element) => {
-    if (!(element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement || element instanceof HTMLButtonElement)) {
+    if (
+      !(
+        element instanceof HTMLInputElement ||
+        element instanceof HTMLSelectElement ||
+        element instanceof HTMLTextAreaElement ||
+        element instanceof HTMLButtonElement
+      )
+    ) {
       return;
     }
     element.disabled = isSubmitting;
@@ -130,8 +137,14 @@ const saveLead = async (formData, source) => {
   }
 
   if (!response.ok) {
-    const serverMessage = result && typeof result.message === "string" ? result.message : "No se pudo registrar la solicitud.";
-    throw new Error(serverMessage);
+    const serverMessage =
+      result && typeof result.message === "string"
+        ? result.message
+        : "No se pudo registrar la solicitud.";
+
+    const requestError = new Error(serverMessage);
+    requestError.status = response.status;
+    throw requestError;
   }
 
   return result;
@@ -160,8 +173,19 @@ const setupQuoteForm = () => {
       form.reset();
       showFeedback("Solicitud enviada correctamente. Te contactaremos pronto.");
     } catch (error) {
+      const status = error && typeof error === "object" ? Number(error.status || 0) : 0;
+
+      if (status >= 400 && status < 500) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Revisa los datos del formulario e intenta nuevamente.";
+        showFeedback(message, true);
+        return;
+      }
+
       const fallbackMailto = buildMailtoUrl(data);
-      showFeedback("No se pudo guardar automáticamente. Se abrirá tu correo como respaldo.", true);
+      showFeedback("No se pudo guardar automaticamente. Se abrira tu correo como respaldo.", true);
       window.location.href = fallbackMailto;
     } finally {
       setSubmittingState(form, false);
@@ -180,14 +204,19 @@ const setupQuoteForm = () => {
     const whatsappUrl = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(message)}`;
 
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    showFeedback("WhatsApp se abrió en una nueva pestaña con tu solicitud preparada.");
+    showFeedback("WhatsApp se abrio en una nueva pestana con tu solicitud preparada.");
 
     saveLead(data, "whatsapp")
       .then(() => {
         showFeedback("WhatsApp abierto y contacto registrado en tu base de datos.");
       })
-      .catch(() => {
-        showFeedback("WhatsApp abierto, pero no pudimos guardar este contacto automáticamente.", true);
+      .catch((error) => {
+        const status = error && typeof error === "object" ? Number(error.status || 0) : 0;
+        if (status >= 400 && status < 500 && error instanceof Error) {
+          showFeedback(`WhatsApp abierto. No se registro el contacto: ${error.message}`, true);
+          return;
+        }
+        showFeedback("WhatsApp abierto, pero no pudimos guardar este contacto automaticamente.", true);
       });
   });
 };
