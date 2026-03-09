@@ -1,0 +1,20 @@
+﻿<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0E2937"/>
+      <stop offset="1" stop-color="#007A96"/>
+    </linearGradient>
+    <linearGradient id="shape" x1="242" y1="102" x2="907" y2="540" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F68F2B" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFD36A" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="980" cy="120" r="170" fill="#F68F2B" fill-opacity="0.2"/>
+  <circle cx="170" cy="540" r="220" fill="#0BB5CF" fill-opacity="0.25"/>
+  <path d="M120 468C207 359 390 270 593 270C760 270 887 348 1026 468" stroke="url(#shape)" stroke-width="26" stroke-linecap="round"/>
+  <text x="118" y="255" fill="white" font-family="Space Grotesk, Arial, sans-serif" font-size="82" font-weight="700">NexgenFlows Ingeniería</text>
+  <text x="120" y="330" fill="#DBF4FC" font-family="Sora, Arial, sans-serif" font-size="36" font-weight="500">Automatización, control y proyectos integrales</text>
+  <text x="120" y="390" fill="#DBF4FC" font-family="Sora, Arial, sans-serif" font-size="32" font-weight="400">Salas de bombas | Tableros eléctricos | Riego automático</text>
+</svg>
+

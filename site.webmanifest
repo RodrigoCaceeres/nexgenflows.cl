@@ -1,0 +1,17 @@
+﻿{
+  "name": "NexgenFlows Ingeniería",
+  "short_name": "NexgenFlows",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#edf4f7",
+  "theme_color": "#0E2937",
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
+
