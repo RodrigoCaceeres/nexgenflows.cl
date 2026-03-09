@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -253,7 +253,7 @@
           <h2>Cuéntanos tu requerimiento y te contactamos</h2>
           <p>
             Completa el formulario y te preparamos una propuesta técnica y comercial acorde a tu proyecto.
-            Puedes enviar la solicitud por correo o WhatsApp.
+            Tu solicitud se guarda automáticamente en nuestra base de contactos y también puedes enviarla por WhatsApp.
           </p>
           <div class="contact-card">
             <p><strong>Correo:</strong> <a id="contactEmailLink" href="mailto:contacto@nexgenflows.cl">contacto@nexgenflows.cl</a></p>
@@ -291,8 +291,13 @@
           <label for="mensaje">Detalle del requerimiento*</label>
           <textarea id="mensaje" name="mensaje" rows="5" required placeholder="Describe tu necesidad, ubicación y plazos estimados..."></textarea>
 
+          <div class="hp-field" aria-hidden="true">
+            <label for="website">Sitio web</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Enviar por correo</button>
+            <button type="submit" class="btn btn-primary">Enviar solicitud</button>
             <button type="button" id="sendWhatsapp" class="btn btn-outline">Enviar por WhatsApp</button>
           </div>
           <p class="form-note" id="formFeedback" role="status" aria-live="polite"></p>
@@ -333,11 +338,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-

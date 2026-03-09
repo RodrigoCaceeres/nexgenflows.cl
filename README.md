@@ -1,80 +1,76 @@
-﻿# NexgenFlows IngenierÃ­a - Sitio Web Corporativo
+# NexgenFlows Ingeniería - Sitio Web Corporativo
 
-Sitio web corporativo moderno para captar contactos, mostrar servicios y vender productos de NexgenFlows IngenierÃ­a.
+Sitio web corporativo de `nexgenflows.cl` con:
 
-## Estructura
+- presentación de servicios y productos
+- formulario de cotización
+- envío por WhatsApp
+- guardado de leads en Supabase vía API de Vercel
 
-- `index.html`: contenido y secciones del sitio.
-- `styles.css`: diseÃ±o responsive, look visual y animaciones.
-- `script.js`: navegaciÃ³n mÃ³vil, formulario, efectos de scroll y microinteracciones.
-- `assets/logo-nexgenflows-transparent.png`: logo principal para cabecera.
-- `assets/favicon.svg`: Ã­cono del sitio.
-- `assets/og-image.svg`: imagen social para compartir.
-- `robots.txt`, `sitemap.xml`, `site.webmanifest`: SEO tÃ©cnico bÃ¡sico.
-- `vercel.json`: headers de seguridad y cachÃ© para despliegue en Vercel.
-- `404.html`: pÃ¡gina personalizada de error para rutas inexistentes.
+## Estructura principal
 
-## PersonalizaciÃ³n rÃ¡pida (importante)
+- `index.html`: contenido y secciones
+- `styles.css`: diseño responsive y estilos
+- `script.js`: interacción de UI y envío del formulario
+- `api/leads.js`: endpoint serverless para guardar contactos
+- `supabase/schema.sql`: SQL para crear la tabla `leads`
+- `.env.example`: variables de entorno requeridas
+- `robots.txt`, `sitemap.xml`, `site.webmanifest`: SEO técnico
+- `vercel.json`: headers de seguridad/cache
 
-Antes de publicar, actualiza los datos reales de contacto en `script.js`:
+## Formulario: cómo funciona ahora
 
-```js
-const CONTACT = {
-  email: "contacto@nexgenflows.cl",
-  whatsapp: "56936619216",
-  whatsappVisible: "+56 9 3661 9216"
-};
-```
+1. El botón `Enviar solicitud` envía los datos a `POST /api/leads`.
+2. La API valida campos, filtra bots (honeypot) y guarda en Supabase.
+3. Si falla la API, el sitio abre `mailto:` como respaldo para no perder la cotización.
+4. El botón `Enviar por WhatsApp` abre WhatsApp y también intenta guardar el lead.
 
-TambiÃ©n puedes ajustar textos de servicios y productos en `index.html`.
+## Configuración de Supabase (una vez)
 
-## Probar en local
+1. Crea un proyecto en [Supabase](https://supabase.com/).
+2. Ve a **SQL Editor** y ejecuta el archivo `supabase/schema.sql`.
+3. En **Project Settings > API** copia:
+   - `Project URL`
+   - `service_role` key
 
-### OpciÃ³n 1: con Node
+## Variables de entorno en Vercel
 
-```bash
-npx serve .
-```
+En tu proyecto de Vercel, crea estas variables:
 
-Luego abre: `http://localhost:3000`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-### OpciÃ³n 2: servidor simple de VS Code u otro servidor estÃ¡tico
+Opcionales para notificación por correo (por ejemplo, a Gmail):
 
-AsegÃºrate de abrir la carpeta `C:\Users\user1\Documents\New project` como raÃ­z.
+- `LEADS_NOTIFY_EMAIL`
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL`
 
-## Publicar en Vercel
+Referencia: usa `.env.example` como plantilla (sin subir secretos a GitHub).
 
-1. Crea un repositorio en GitHub y sube estos archivos.
-2. Entra a [Vercel](https://vercel.com), inicia sesiÃ³n y conecta tu cuenta de GitHub.
-3. Click en **Add New... > Project**.
-4. Importa el repositorio `nexgenflows`.
-5. Vercel detectarÃ¡ un proyecto estÃ¡tico automÃ¡ticamente.
-6. Click en **Deploy**.
-7. Espera el despliegue y valida que la URL temporal de Vercel abra correctamente.
+## Despliegue
 
-## Conectar dominio `nexgenflows.cl` desde GoDaddy
+El proyecto está conectado a Vercel y GitHub.
 
-1. En Vercel: ve a **Project > Settings > Domains**.
-2. Agrega:
-   - `nexgenflows.cl`
-   - `www.nexgenflows.cl`
-3. Vercel te mostrarÃ¡ registros DNS. En la mayorÃ­a de casos:
-   - Tipo `A` para `@` apuntando a `76.76.21.21`
-   - Tipo `CNAME` para `www` apuntando a `cname.vercel-dns.com`
-4. En GoDaddy: abre **DNS Management** de `nexgenflows.cl` y crea/edita esos registros.
-5. Espera propagaciÃ³n DNS (puede tardar minutos u horas).
-6. Vuelve a Vercel y confirma estado **Valid Configuration**.
+Flujo recomendado:
 
-## Checklist final antes de producciÃ³n
+1. haces cambios locales
+2. `git add .`
+3. `git commit -m "mensaje"`
+4. `git push`
+5. Vercel despliega automáticamente
 
-- [ ] Correo y WhatsApp reales configurados en `script.js`
-- [ ] Revisados textos finales de servicios/productos
-- [ ] Probado formulario en mÃ³vil y escritorio
-- [ ] Probado menÃº mÃ³vil y enlaces de navegaciÃ³n
-- [ ] Dominio principal en Vercel: `nexgenflows.cl`
-- [ ] HTTPS activo (Vercel lo habilita automÃ¡ticamente)
-- [ ] Google Search Console y Google Analytics configurados
+## Ver leads guardados
 
-## PrÃ³xima mejora recomendada
+En Supabase:
 
-Integrar un backend o servicio de formularios (por ejemplo, Resend + API) para registrar cotizaciones en una bandeja central sin depender del cliente de correo del visitante.
+1. **Table Editor**
+2. tabla `public.leads`
+3. revisa `created_at`, `status`, `tipo`, `mensaje`, etc.
+
+## Dominio y SEO
+
+- Dominio activo: `https://www.nexgenflows.cl/`
+- Sitemap: `https://www.nexgenflows.cl/sitemap.xml`
+- Robots: `https://www.nexgenflows.cl/robots.txt`
+- Search Console: propiedad verificada y sitemap enviado

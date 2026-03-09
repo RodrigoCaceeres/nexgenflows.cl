@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #edf4f7;
   --bg-alt: #d6e5eb;
   --surface: #ffffff;
@@ -629,6 +629,7 @@ ul {
   padding: 1.4rem;
   display: grid;
   gap: 0.62rem;
+  position: relative;
 }
 
 .quote-form label {
@@ -672,6 +673,22 @@ ul {
   min-height: 1.3rem;
   color: var(--primary-deep);
   font-size: 0.9rem;
+}
+
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.quote-form button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .site-footer {

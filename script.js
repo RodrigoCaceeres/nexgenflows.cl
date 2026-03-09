@@ -1,8 +1,10 @@
-﻿const CONTACT = {
+const CONTACT = {
   email: "contacto@nexgenflows.cl",
   whatsapp: "56936619216",
   whatsappVisible: "+56 9 3661 9216"
 };
+
+const LEADS_API_ENDPOINT = "/api/leads";
 
 const setContactLinks = () => {
   const emailAnchors = ["contactEmailLink", "footerEmail"];
@@ -67,6 +69,12 @@ const quoteMessage = (formData) => {
   ].join("\n");
 };
 
+const buildMailtoUrl = (formData) => {
+  const subject = `Cotización - ${formData.tipo} - ${formData.nombre}`;
+  const body = quoteMessage(formData);
+  return `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+};
+
 const getFormData = (form) => {
   const raw = new FormData(form);
   return {
@@ -75,7 +83,8 @@ const getFormData = (form) => {
     correo: (raw.get("correo") || "").toString().trim(),
     telefono: (raw.get("telefono") || "").toString().trim(),
     tipo: (raw.get("tipo") || "").toString().trim(),
-    mensaje: (raw.get("mensaje") || "").toString().trim()
+    mensaje: (raw.get("mensaje") || "").toString().trim(),
+    website: (raw.get("website") || "").toString().trim()
   };
 };
 
@@ -87,12 +96,53 @@ const showFeedback = (text, isError = false) => {
   feedback.style.color = isError ? "#a52a2a" : "#0d3f53";
 };
 
+const setSubmittingState = (form, isSubmitting) => {
+  const elements = form.querySelectorAll("input, select, textarea, button");
+  elements.forEach((element) => {
+    if (!(element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement || element instanceof HTMLButtonElement)) {
+      return;
+    }
+    element.disabled = isSubmitting;
+  });
+};
+
+const saveLead = async (formData, source) => {
+  const payload = {
+    ...formData,
+    source,
+    pageUrl: window.location.href,
+    userAgent: navigator.userAgent
+  };
+
+  const response = await fetch(LEADS_API_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  let result = null;
+  try {
+    result = await response.json();
+  } catch (_error) {
+    result = null;
+  }
+
+  if (!response.ok) {
+    const serverMessage = result && typeof result.message === "string" ? result.message : "No se pudo registrar la solicitud.";
+    throw new Error(serverMessage);
+  }
+
+  return result;
+};
+
 const setupQuoteForm = () => {
   const form = document.getElementById("quoteForm");
   const whatsappBtn = document.getElementById("sendWhatsapp");
   if (!form || !whatsappBtn) return;
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (!form.checkValidity()) {
@@ -102,12 +152,20 @@ const setupQuoteForm = () => {
     }
 
     const data = getFormData(form);
-    const subject = `Cotización - ${data.tipo} - ${data.nombre}`;
-    const body = quoteMessage(data);
-    const mailto = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setSubmittingState(form, true);
+    showFeedback("Enviando solicitud...");
 
-    window.location.href = mailto;
-    showFeedback("Se abrió tu cliente de correo con la cotización lista para enviar.");
+    try {
+      await saveLead(data, "web_form");
+      form.reset();
+      showFeedback("Solicitud enviada correctamente. Te contactaremos pronto.");
+    } catch (error) {
+      const fallbackMailto = buildMailtoUrl(data);
+      showFeedback("No se pudo guardar automáticamente. Se abrirá tu correo como respaldo.", true);
+      window.location.href = fallbackMailto;
+    } finally {
+      setSubmittingState(form, false);
+    }
   });
 
   whatsappBtn.addEventListener("click", () => {
@@ -123,6 +181,14 @@ const setupQuoteForm = () => {
 
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     showFeedback("WhatsApp se abrió en una nueva pestaña con tu solicitud preparada.");
+
+    saveLead(data, "whatsapp")
+      .then(() => {
+        showFeedback("WhatsApp abierto y contacto registrado en tu base de datos.");
+      })
+      .catch(() => {
+        showFeedback("WhatsApp abierto, pero no pudimos guardar este contacto automáticamente.", true);
+      });
   });
 };
 
@@ -272,4 +338,3 @@ const init = () => {
 };
 
 document.addEventListener("DOMContentLoaded", init);
-
