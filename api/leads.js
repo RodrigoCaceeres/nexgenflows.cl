@@ -113,6 +113,11 @@ const sendLeadNotification = async (lead) => {
     if (!emailResponse.ok) {
       const details = await emailResponse.text();
       console.error("No se pudo enviar notificacion Resend:", details);
+    } else {
+      console.log("Resend envio OK:", {
+        status: emailResponse.status,
+        to: notifyEmail
+      });
     }
   } catch (error) {
     console.error("Error enviando notificacion Resend:", error);
